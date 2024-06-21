@@ -4,10 +4,6 @@
 #include <ESP8266WiFi.h>
 #include <SPI.h> // Not strictly necessary for MPU6050, but may be required on some boards
 
-// WiFi credentials (replace with your network SSID and password)
-const char* ssid = "your_ssid";
-const char* password = "your_password";
-
 // Static IP configuration (replace with desired IP, subnet mask, and gateway)
 IPAddress local_IP(172, 21, 0, 18);
 IPAddress subnet(255, 255, 248, 0);
@@ -37,8 +33,8 @@ void setup() {
   // Configure WiFi with static IP
   WiFi.config(local_IP, gateway, subnet);
   Serial.print("Connecting to WiFi: ");
-  Serial.println(ssid);
-  WiFi.begin(ssid, password);
+  Serial.println("ssid","Password");
+  WiFi.begin(ssid);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
@@ -53,48 +49,27 @@ void setup() {
 
 void loop() {
   WiFiClient client = server.available();
-  mpu.getEvent(&a, &g, &temp);
-
-  // Print sensor data to serial monitor for debugging
-  Serial.print(a.acceleration.x);
-  Serial.print("\t");
-  Serial.print(a.acceleration.y);
-  Serial.print("\t");
-  Serial.print(a.acceleration.z);
-  Serial.print("\t");
-  Serial.print(g.gyro.x);
-  Serial.print("\t");
-  Serial.print(g.gyro.y);
-  Serial.print("\t");
-  Serial.print(g.gyro.z);
-  Serial.print("\t");
-  Serial.print(temp.temperature);
-  Serial.println();
-  delay(1000);
-
+  
   if (client) {
-    // Read sensor data (already done in the beginning of loop)
-
-    // Prepare web page content
-    String response = "<!DOCTYPE html><html><head><title>MPU6050 Sensor Data</title></head><body><h1>ESP8266 MPU6050 Sensor Readings</h1><p>Acceleration (g):</p><ul><li>X: ";
-    response += a.acceleration.x;
-    response += "</li><li>Y: ";
-    response += a.acceleration.y;
-    response += "</li><li>Z: ";
-    response += a.acceleration.z;
-    response += "</li></ul><p>Gyroscope (rad/sec):</p><ul><li>X: ";
-    response += g.gyro.x;
-    response += "</li><li>Y: ";
-    response += g.gyro.y;
-    response += "</li><li>Z: ";
-    response += g.gyro.z;
-    response += "</li></ul><p>Temperature (°C): ";
-    response += temp.temperature;
-    response += "</p></body></html>";
-
-    // Send web page content
-    client.println(response);
+    Serial.println("Client connected");
+    while (client.connected()) {
+      mpu.getEvent(&a, &g, &temp);
+      
+      // Prepare sensor data as a string
+      String data = String(a.acceleration.x) + "\t" + 
+                    String(a.acceleration.y) + "\t" + 
+                    String(a.acceleration.z) + "\t" + 
+                    String(g.gyro.x) + "\t" + 
+                    String(g.gyro.y) + "\t" + 
+                    String(g.gyro.z) + "\t" + 
+                    String(temp.temperature) + "\n";
+      
+      // Send sensor data to the client
+      client.print(data);
+      
+      delay(1000); // Wait for 1 second before sending the next data
+    }
     client.stop();
-    Serial.println("Client served.");
+    Serial.println("Client disconnected");
   }
 }
