@@ -70,8 +70,8 @@ void handleRoot() {
     }
     .topnav {
       overflow: hidden;
-      background-color: #003366;
-      color: #FFD43B;
+      background-color: #de9733;
+      color: #1c1a14;
       font-size: 1rem;
     }
     .content {
@@ -82,7 +82,7 @@ void handleRoot() {
       box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);
     }
     .card-title {
-      color: #003366;
+      color: #de9733;
       font-weight: bold;
     }
     .cards {
@@ -105,7 +105,7 @@ void handleRoot() {
     #reset, #resetX, #resetY, #resetZ {
       border: none;
       color: #FEFCFB;
-      background-color: #003366;
+      background-color: #de9733;
       padding: 10px;
       text-align: center;
       display: inline-block;
@@ -124,7 +124,7 @@ void handleRoot() {
 </head>
 <body>
   <div class="topnav">
-    <h1><i class="far fa-compass"></i> MPU6050 <i class="far fa-compass"></i></h1>
+    <h1> Gyroscope 3D Virtualization </h1>
   </div>
   <div class="content">
     <div class="cards">
@@ -143,7 +143,7 @@ void handleRoot() {
       <div class="card">
         <p class="card-title">TEMPERATURE</p>
         <p><span class="reading"><span id="temp"></span> &deg;C</span></p>
-        <p class="card-title">3D ANIMATION</p>
+        <p class="card-title">3D</p>
         <button id="reset" onclick="resetPosition(this)">RESET POSITION</button>
         <button id="resetX" onclick="resetPosition(this)">X</button>
         <button id="resetY" onclick="resetPosition(this)">Y</button>
