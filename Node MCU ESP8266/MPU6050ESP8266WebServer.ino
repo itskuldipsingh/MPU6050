@@ -127,20 +127,26 @@ void handleRoot() {
     <h1> Gyroscope 3D Virtualization </h1>
   </div>
   <div class="content">
+    <div>
+      <label><input type="radio" name="dataType" value="gyro" checked onclick="toggleSection('gyro')"> Gyroscope</label>
+      <label><input type="radio" name="dataType" value="accel" onclick="toggleSection('accel')"> Accelerometer</label>
+      <label><input type="radio" name="dataType" value="temp" onclick="toggleSection('temp')"> Temperature</label>
+      <label><input type="radio" name="dataType" value="all" onclick="toggleSection('all')"> All</label>
+    </div>
     <div class="cards">
-      <div class="card">
+      <div class="card" id="gyroCard">
         <p class="card-title">GYROSCOPE</p>
         <p><span class="reading">X: <span id="gyroX"></span> rad</span></p>
         <p><span class="reading">Y: <span id="gyroY"></span> rad</span></p>
         <p><span class="reading">Z: <span id="gyroZ"></span> rad</span></p>
       </div>
-      <div class="card">
+      <div class="card" id="accelCard">
         <p class="card-title">ACCELEROMETER</p>
         <p><span class="reading">X: <span id="accX"></span> ms<sup>2</sup></span></p>
         <p><span class="reading">Y: <span id="accY"></span> ms<sup>2</sup></span></p>
         <p><span class="reading">Z: <span id="accZ"></span> ms<sup>2</sup></span></p>
       </div>
-      <div class="card">
+      <div class="card" id="tempCard">
         <p class="card-title">TEMPERATURE</p>
         <p><span class="reading"><span id="temp"></span> &deg;C</span></p>
         <p class="card-title">3D</p>
@@ -225,6 +231,12 @@ void handleRoot() {
       var xhr = new XMLHttpRequest();
       xhr.open("GET", "/reset", true);
       xhr.send();
+    }
+
+    function toggleSection(section) {
+      document.getElementById('gyroCard').style.display = section === 'gyro' || section === 'all' ? 'block' : 'none';
+      document.getElementById('accelCard').style.display = section === 'accel' || section === 'all' ? 'block' : 'none';
+      document.getElementById('tempCard').style.display = section === 'temp' || section === 'all' ? 'block' : 'none';
     }
 
     document.addEventListener('DOMContentLoaded', function() {
