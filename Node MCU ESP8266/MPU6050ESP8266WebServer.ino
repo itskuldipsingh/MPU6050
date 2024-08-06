@@ -14,6 +14,7 @@ const char* password = "";
 void handleRoot();
 void handleData();
 void handleNotFound();
+void handleReset();
 
 void setup() {
   Serial.begin(115200);
@@ -31,6 +32,7 @@ void setup() {
 
   server.on("/", HTTP_GET, handleRoot);
   server.on("/data", HTTP_GET, handleData);
+  server.on("/reset", HTTP_GET, handleReset);
   server.onNotFound(handleNotFound);
 
   server.begin();
@@ -152,31 +154,31 @@ void handleRoot() {
   </div>
   <div class="content">
     <div>
-      <label><input type="checkbox" name="dataType" value="gyro" checked onclick="toggleSection()"> Gyroscope</label>
+      <label><input type="checkbox" name="dataType" value="gyro" onclick="toggleSection()"> Gyroscope</label>
       <label><input type="checkbox" name="dataType" value="accel" onclick="toggleSection()"> Accelerometer</label>
       <label><input type="checkbox" name="dataType" value="temp" onclick="toggleSection()"> Temperature</label>
     </div>
     <div class="cards">
-      <div class="card" id="gyroCard">
+      <div class="card" id="gyroCard" style="display: none;">
         <p class="card-title">GYROSCOPE</p>
         <p><span class="reading">X: <span id="gyroX"></span> rad</span></p>
         <p><span class="reading">Y: <span id="gyroY"></span> rad</span></p>
         <p><span class="reading">Z: <span id="gyroZ"></span> rad</span></p>
       </div>
-      <div class="card" id="accelCard">
+      <div class="card" id="accelCard" style="display: none;">
         <p class="card-title">ACCELEROMETER</p>
         <p><span class="reading">X: <span id="accX"></span> ms<sup>2</sup></span></p>
         <p><span class="reading">Y: <span id="accY"></span> ms<sup>2</sup></span></p>
         <p><span class="reading">Z: <span id="accZ"></span> ms<sup>2</sup></span></p>
       </div>
-      <div class="card" id="tempCard">
+      <div class="card" id="tempCard" style="display: none;">
         <p class="card-title">TEMPERATURE</p>
         <p><span class="reading"><span id="temp"></span> &deg;C</span></p>
         <p class="card-title">3D</p>
-        <button id="reset" onclick="resetPosition(this)">RESET POSITION</button>
-        <button id="resetX" onclick="resetPosition(this)">X</button>
-        <button id="resetY" onclick="resetPosition(this)">Y</button>
-        <button id="resetZ" onclick="resetPosition(this)">Z</button>
+        <button id="reset" onclick="resetPosition()">RESET POSITION</button>
+        <button id="resetX" onclick="resetPosition('x')">X</button>
+        <button id="resetY" onclick="resetPosition('y')">Y</button>
+        <button id="resetZ" onclick="resetPosition('z')">Z</button>
       </div>
     </div>
     <div class="cube-content">
@@ -268,10 +270,17 @@ void handleRoot() {
 
     setInterval(fetchData, 1000);
 
-    function resetPosition(element) {
-      var xhr = new XMLHttpRequest();
-      xhr.open("GET", "/reset", true);
-      xhr.send();
+    function resetPosition(axis) {
+      if (axis === 'x') {
+        cube.rotation.x = 0;
+      } else if (axis === 'y') {
+        cube.rotation.y = 0;
+      } else if (axis === 'z') {
+        cube.rotation.z = 0;
+      } else {
+        cube.rotation.set(0, 0, 0);
+      }
+      renderer.render(scene, camera);
     }
 
     function toggleSection() {
@@ -280,6 +289,8 @@ void handleRoot() {
 
     document.addEventListener('DOMContentLoaded', function() {
       init3D();
+      // Uncheck all checkboxes by default
+      document.querySelectorAll('input[name="dataType"]').forEach(checkbox => checkbox.checked = false);
     });
   </script>
 </body>
@@ -314,6 +325,13 @@ void handleData() {
   serializeJson(jsonDoc, jsonString);
 
   server.send(200, "application/json", jsonString);
+}
+
+void handleReset() {
+  // Handle resetting the position
+  Serial.println("Resetting position");
+  // Additional code to reset if needed
+  server.send(200, "text/plain", "Position reset");
 }
 
 void handleNotFound() {
