@@ -82,7 +82,7 @@ void handleRoot() {
       box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);
     }
     .card-title {
-      color: black; /* Changed to black */
+      color: black;
       font-weight: bold;
     }
     .cards {
@@ -119,6 +119,30 @@ void handleRoot() {
       width: 20px;
       padding-top: 10px;
       padding-bottom: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .cards {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      }
+      .reading {
+        font-size: 1rem;
+      }
+      .cube-content {
+        height: 200px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .cards {
+        grid-template-columns: 1fr;
+      }
+      .reading {
+        font-size: 0.8rem;
+      }
+      .cube-content {
+        height: 150px;
+      }
     }
   </style>
 </head>
@@ -264,10 +288,18 @@ void handleRoot() {
   server.send(200, "text/html", html);
 }
 
-
 void handleData() {
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
+
+  // Print data to serial monitor
+  Serial.print(a.acceleration.x); Serial.print("\t");
+  Serial.print(a.acceleration.y); Serial.print("\t");
+  Serial.print(a.acceleration.z); Serial.print("\t");
+  Serial.print(g.gyro.x); Serial.print("\t");
+  Serial.print(g.gyro.y); Serial.print("\t");
+  Serial.print(g.gyro.z); Serial.print("\t");
+  Serial.println(temp.temperature);
 
   StaticJsonDocument<200> jsonDoc;
   jsonDoc["accelX"] = a.acceleration.x;
