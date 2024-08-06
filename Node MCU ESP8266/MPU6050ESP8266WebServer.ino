@@ -15,7 +15,13 @@ void handleRoot();
 void handleData();
 void handleNotFound();
 
+// Static IP configuration (replace with desired IP, subnet mask, and gateway) (comment below 3 lines if you are using DHCP IP)
+IPAddress local_IP(172, 21, 0, 18);
+IPAddress subnet(255, 255, 248, 0);
+IPAddress gateway(172, 21, 7, 254);
+
 void setup() {
+  
   Serial.begin(115200);
   WiFi.begin(ssid, password);
 
@@ -23,6 +29,8 @@ void setup() {
     delay(500);
     Serial.print(".");
   }
+
+  WiFi.config(local_IP, gateway, subnet); //comment this line if you are using DHCP IP
 
   Serial.println("");
   Serial.println("WiFi connected");
