@@ -15,13 +15,7 @@ void handleRoot();
 void handleData();
 void handleNotFound();
 
-// Static IP configuration (replace with desired IP, subnet mask, and gateway) (comment below 3 lines if you are using DHCP IP)
-IPAddress local_IP(172, 21, 0, 18);
-IPAddress subnet(255, 255, 248, 0);
-IPAddress gateway(172, 21, 7, 254);
-
 void setup() {
-  
   Serial.begin(115200);
   WiFi.begin(ssid, password);
 
@@ -29,8 +23,6 @@ void setup() {
     delay(500);
     Serial.print(".");
   }
-
-  WiFi.config(local_IP, gateway, subnet); //comment this line if you are using DHCP IP
 
   Serial.println("");
   Serial.println("WiFi connected");
@@ -90,7 +82,7 @@ void handleRoot() {
       box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);
     }
     .card-title {
-      color: #de9733;
+      color: black; /* Changed to black */
       font-weight: bold;
     }
     .cards {
@@ -136,10 +128,9 @@ void handleRoot() {
   </div>
   <div class="content">
     <div>
-      <label><input type="radio" name="dataType" value="gyro" checked onclick="toggleSection('gyro')"> Gyroscope</label>
-      <label><input type="radio" name="dataType" value="accel" onclick="toggleSection('accel')"> Accelerometer</label>
-      <label><input type="radio" name="dataType" value="temp" onclick="toggleSection('temp')"> Temperature</label>
-      <label><input type="radio" name="dataType" value="all" onclick="toggleSection('all')"> All</label>
+      <label><input type="checkbox" name="dataType" value="gyro" checked onclick="toggleSection()"> Gyroscope</label>
+      <label><input type="checkbox" name="dataType" value="accel" onclick="toggleSection()"> Accelerometer</label>
+      <label><input type="checkbox" name="dataType" value="temp" onclick="toggleSection()"> Temperature</label>
     </div>
     <div class="cards">
       <div class="card" id="gyroCard">
@@ -218,13 +209,31 @@ void handleRoot() {
       fetch('/data')
         .then(response => response.json())
         .then(data => {
-          document.getElementById("gyroX").innerHTML = data.gyroX.toFixed(2);
-          document.getElementById("gyroY").innerHTML = data.gyroY.toFixed(2);
-          document.getElementById("gyroZ").innerHTML = data.gyroZ.toFixed(2);
-          document.getElementById("accX").innerHTML = data.accelX.toFixed(2);
-          document.getElementById("accY").innerHTML = data.accelY.toFixed(2);
-          document.getElementById("accZ").innerHTML = data.accelZ.toFixed(2);
-          document.getElementById("temp").innerHTML = data.temp.toFixed(2);
+          if (document.querySelector('input[name="dataType"][value="gyro"]').checked) {
+            document.getElementById("gyroCard").style.display = 'block';
+            document.getElementById("gyroX").innerHTML = data.gyroX.toFixed(2);
+            document.getElementById("gyroY").innerHTML = data.gyroY.toFixed(2);
+            document.getElementById("gyroZ").innerHTML = data.gyroZ.toFixed(2);
+          } else {
+            document.getElementById("gyroCard").style.display = 'none';
+          }
+
+          if (document.querySelector('input[name="dataType"][value="accel"]').checked) {
+            document.getElementById("accelCard").style.display = 'block';
+            document.getElementById("accX").innerHTML = data.accelX.toFixed(2);
+            document.getElementById("accY").innerHTML = data.accelY.toFixed(2);
+            document.getElementById("accZ").innerHTML = data.accelZ.toFixed(2);
+          } else {
+            document.getElementById("accelCard").style.display = 'none';
+          }
+
+          if (document.querySelector('input[name="dataType"][value="temp"]').checked) {
+            document.getElementById("tempCard").style.display = 'block';
+            document.getElementById("temp").innerHTML = data.temp.toFixed(2);
+          } else {
+            document.getElementById("tempCard").style.display = 'none';
+          }
+
           cube.rotation.x = data.gyroY;
           cube.rotation.z = data.gyroX;
           cube.rotation.y = data.gyroZ;
@@ -241,10 +250,8 @@ void handleRoot() {
       xhr.send();
     }
 
-    function toggleSection(section) {
-      document.getElementById('gyroCard').style.display = section === 'gyro' || section === 'all' ? 'block' : 'none';
-      document.getElementById('accelCard').style.display = section === 'accel' || section === 'all' ? 'block' : 'none';
-      document.getElementById('tempCard').style.display = section === 'temp' || section === 'all' ? 'block' : 'none';
+    function toggleSection() {
+      fetchData(); // Update display based on current checkbox state
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -256,6 +263,7 @@ void handleRoot() {
   )=====";
   server.send(200, "text/html", html);
 }
+
 
 void handleData() {
   sensors_event_t a, g, temp;
